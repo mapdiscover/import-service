@@ -12,10 +12,10 @@ print('osm2pgsql version: ' .. osm2pgsql.version)
 local tables = {}
 
 tables.pois = osm2pgsql.define_node_table('pois', {
-    { column = 'id',      type = 'serial', create_only = true },
-    { column = 'name',    type = 'text',   not_null = true },
-    { column = 'geom',    type = 'point' },
-    { column = 'info',    type = 'jsonb'}
+    { column = 'id',   type = 'serial', create_only = true },
+    { column = 'name', type = 'text',   not_null = true },
+    { column = 'geom', type = 'point' },
+    { column = 'info', type = 'jsonb'}
 })
 
 -- The OSM processors:

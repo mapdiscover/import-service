@@ -171,6 +171,12 @@ def init(conn, args):
 
     return 0
 
+def ready(conn, args):
+    """\
+    Vli
+    """
+    
+
 def update(conn, args):
     """\
     Download newly available data and apply it to the database.
