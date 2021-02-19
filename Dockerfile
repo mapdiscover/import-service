@@ -21,7 +21,7 @@ WORKDIR /src
 RUN apt-get update && apt-get install -y git
 RUN git clone https://github.com/openstreetmap/osm2pgsql
 RUN cd osm2pgsql
-RUN git checkout $OSM2PGSQL_VERSION
+RUN git checkout tags/$OSM2PGSQL_VERSION
 
 RUN apt-get install -y make cmake g++ libboost-dev libboost-system-dev \
   libboost-filesystem-dev libexpat1-dev zlib1g-dev \
