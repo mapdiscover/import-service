@@ -173,9 +173,25 @@ def init(conn, args):
 
 def ready(conn, args):
     """\
-    Vli
+    Checks whether the configured database contains replication state and if the
+    import has been executed before.
     """
-    
+    with conn.cursor() as cur:
+        cur.execute('SELECT * FROM pg_tables where tablename = %s', (args.table, ))
+        if cur.rowcount < 1:
+            LOG.fatal("Cannot find replication status table. "
+                        "Run 'osm2pgsql-replication init' first.")
+            return 1
+
+        cur.execute('SELECT * FROM "{}"'.format(args.table))
+        if cur.rowcount != 1:
+            LOG.fatal("Updates not set up correctly. Run 'osm2pgsql-replication init' first.")
+            return 1
+
+        base_url, seq, ts = cur.fetchone()
+        LOG.info("Using replication service '%s'. Current sequence %d (%s).",
+                    base_url, seq, ts)
+        return 0
 
 def update(conn, args):
     """\
@@ -200,7 +216,7 @@ def update(conn, args):
 
         cur.execute('SELECT * FROM "{}"'.format(args.table))
         if cur.rowcount != 1:
-            LOG.fatal("Updates not set up correctly. Run 'osm2pgsql-updates init' first.")
+            LOG.fatal("Updates not set up correctly. Run 'osm2pgsql-replication init' first.")
             return 1
 
         base_url, seq, ts = cur.fetchone()
@@ -324,6 +340,16 @@ def get_parser():
                      help='Path to osm2pgsql command (default: osm2pgsql)')
     cmd.add_argument('--once', action='store_true',
                      help='Run updates only once, even when more data is available.')
+
+    
+    # Arguments for ready
+    cmd = subs.add_parser('ready', parents=[default_args],
+                          usage='%(prog)s ready [options] [-- param [param ...]]',
+                          help=ready.__doc__.split('\n', 1)[0],
+                          description=dedent(ready.__doc__),
+                          formatter_class=RawDescriptionHelpFormatter,
+                          add_help=False)
+    cmd.set_defaults(handler=ready)
 
     return parser
 

@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  database:
+    image: postgis/postgis:13-3.1-alpine
+    environment:
+      POSTGRES_DB: mapdiscover
+      POSTGRES_USER: mapdiscover
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - database-data:/var/lib/postgresql/data
+  import-service:
+    depends_on: 
+      - database
+    build:
+      context: ../
+      dockerfile: Dockerfile
+      args:
+        OSM2PGSQL_VERSION: 1.4.1
+    environment:
+      OSM_FILE: /osm/bremen-latest.osm.pbf
+      POSTGRES_HOST: database
+      POSTGRES_DB: mapdiscover
+      POSTGRES_USER: mapdiscover
+    volumes:
+      - ../../bremen-latest.osm.pbf:/osm/bremen-latest.osm.pbf:ro
+
+volumes:
+  database-data:
