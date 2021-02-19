@@ -19,8 +19,7 @@ ENV POSTGRES_PASSWORD osm2pgsql
 WORKDIR /src
 
 RUN apt-get update && apt-get install -y git
-RUN git clone https://github.com/openstreetmap/osm2pgsql
-RUN cd osm2pgsql
+RUN git clone https://github.com/openstreetmap/osm2pgsql .
 RUN git checkout tags/$OSM2PGSQL_VERSION
 
 RUN apt-get install -y make cmake g++ libboost-dev libboost-system-dev \
@@ -28,7 +27,7 @@ RUN apt-get install -y make cmake g++ libboost-dev libboost-system-dev \
   libbz2-dev libpq-dev libproj-dev lua5.3 liblua5.3-dev pandoc \
   libluajit-5.1-dev
 
-RUN mkdir build && cd build
+WORKDIR /src/build
 RUN cmake -D WITH_LUAJIT=$OSM2PGSQL_LUAJIT ..
 
 RUN make
@@ -40,4 +39,4 @@ RUN apt-get clean \
 COPY ./scripts/ /scripts/
 COPY ./processor/ /processor/
 
-ENTRYPOINT [ "/wrapper/osm2pgsql-docker-wrapper", "start" ]
+ENTRYPOINT [ "/scripts/osm2pgsql-docker", "-- --output=flex  --style='/processor/main.lua'" ]
