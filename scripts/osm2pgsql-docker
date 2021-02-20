@@ -11,18 +11,12 @@ how to use %(prog)s.
 """
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-import datetime as dt
-import json
 import logging
 import sys
 import subprocess
-import tempfile
 import time
-from textwrap import dedent
 import traceback
-from pathlib import Path
 from os import environ
-import urllib.request as urlrequest
 
 LOG = logging.getLogger()
 
@@ -68,8 +62,9 @@ def run_replication_cmd(args, action, replication_args):
         replication.extend(('--host', args.host))
     if args.port:
         replication.extend(('--port', args.port))
-
+        
     replication.extend(replication_args)
+
     LOG.debug("Calling replication with: %s", ' '.join(replication))
 
     if args.dry_run:
@@ -80,7 +75,6 @@ def run_replication_cmd(args, action, replication_args):
 
 def osm2pgsql_import_cmd(args):
     osm2pgsql = [args.osm2pgsql_cmd, '--create', '--slim', '--prefix', args.prefix]
-    osm2pgsql.extend(args.extra_params)
     if args.database:
         osm2pgsql.extend(('-d', args.database))
     if args.username:
@@ -123,7 +117,7 @@ def get_parser():
                             prog='osm2pgsql-docker',
                             formatter_class=RawDescriptionHelpFormatter)
 
-    cmd.add_argument('--dry-run', action='store_true',
+    parser.add_argument('--dry-run', action='store_true',
                      help='Does not actually execute the commands')
 
     # TODO: Implement those also via environment variables and hand them through

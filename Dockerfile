@@ -44,12 +44,15 @@ COPY --from=build /usr/local/bin/osm2pgsql /usr/local/bin/osm2pgsql
 RUN apt-get update && apt-get install --no-install-recommends -y debhelper cmake libboost-dev \
   libboost-system-dev libboost-filesystem-dev libbz2-dev libexpat1-dev \
   libosmium2-dev libpq-dev libproj-dev zlib1g-dev liblua5.3-dev lua5.3 \
-  libluajit-5.1-dev python3 python3-psycopg2
+  libluajit-5.1-dev python3 python3-psycopg2 python-pip
 
 RUN apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
+RUN pip install osmium
+
 COPY ./scripts/ /scripts/
 COPY ./processor/ /processor/
 
-ENTRYPOINT [ "/scripts/osm2pgsql-docker", "-- --output=flex  --style='/processor/main.lua'" ]
+# ENTRYPOINT [ "/bin/bash" ]
+ENTRYPOINT [ "/scripts/osm2pgsql-docker", "--dry-run -- --output=flex  --style='/processor/main.lua'" ]
