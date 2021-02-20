@@ -1,4 +1,4 @@
-FROM python:3-slim-buster
+FROM python:3-slim-buster AS build
 
 ARG OSM2PGSQL_VERSION=1.4.1
 ARG OSM2PGSQL_LUAJIT=ON
@@ -32,6 +32,19 @@ RUN cmake -D WITH_LUAJIT=$OSM2PGSQL_LUAJIT ..
 
 RUN make
 RUN make install
+
+RUN apt-get clean \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -rf /src
+
+FROM debian:buster-slim AS base
+
+COPY --from=build /usr/local/bin/osm2pgsql /usr/local/bin/osm2pgsql
+
+RUN apt-get update && apt-get install --no-install-recommends -y debhelper cmake libboost-dev \
+  libboost-system-dev libboost-filesystem-dev libbz2-dev libexpat1-dev \
+  libosmium2-dev libpq-dev libproj-dev zlib1g-dev liblua5.3-dev lua5.3 \
+  libluajit-5.1-dev python3 python3-psycopg2
 
 RUN apt-get clean \
   && rm -rf /var/lib/apt/lists/*

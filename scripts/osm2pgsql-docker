@@ -72,8 +72,11 @@ def run_replication_cmd(args, action, replication_args):
     replication.extend(replication_args)
     LOG.debug("Calling replication with: %s", ' '.join(replication))
 
-    replicationProcess = subprocess.run(replication)
-    return replicationProcess.returncode
+    if args.dry_run:
+        return 0
+    else:
+        replicationProcess = subprocess.run(replication)
+        return replicationProcess.returncode
 
 def osm2pgsql_import_cmd(args):
     osm2pgsql = [args.osm2pgsql_cmd, '--create', '--slim', '--prefix', args.prefix]
@@ -91,8 +94,11 @@ def osm2pgsql_import_cmd(args):
     osm2pgsql.append(args.osm_file)
     LOG.debug("Calling osm2pgsql with: %s", ' '.join(osm2pgsql))
 
-    osm2pgsqlProcess = subprocess.run(osm2pgsql)
-    return osm2pgsqlProcess.returncode
+    if args.dry_run:
+        return 0
+    else:
+        osm2pgsqlProcess = subprocess.run(osm2pgsql)
+        return osm2pgsqlProcess.returncode
 
 def process_env(args):
     envMappings = {
@@ -116,6 +122,9 @@ def get_parser():
     parser = ArgumentParser(description=__doc__,
                             prog='osm2pgsql-docker',
                             formatter_class=RawDescriptionHelpFormatter)
+
+    cmd.add_argument('--dry-run', action='store_true',
+                     help='Does not actually execute the commands')
 
     # TODO: Implement those also via environment variables and hand them through
     group = parser.add_argument_group('Logging arguments')
