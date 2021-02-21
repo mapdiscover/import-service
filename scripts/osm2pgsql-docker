@@ -67,7 +67,7 @@ def run_replication_cmd(args, action, replication_args):
 
     LOG.debug("Calling replication with: %s", ' '.join(replication))
 
-    if args.dry_run:
+    if args.dry_run == true:
         return 0
     else:
         replicationProcess = subprocess.run(replication)
@@ -88,7 +88,7 @@ def osm2pgsql_import_cmd(args):
     osm2pgsql.append(args.osm_file)
     LOG.debug("Calling osm2pgsql with: %s", ' '.join(osm2pgsql))
 
-    if args.dry_run:
+    if args.dry_run == true:
         return 0
     else:
         osm2pgsqlProcess = subprocess.run(osm2pgsql)
