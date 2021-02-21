@@ -49,7 +49,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y debhelper cmake
 RUN apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-RUN pip install osmium
+RUN pip3 install osmium
 
 COPY ./scripts/ /scripts/
 COPY ./processor/ /processor/
