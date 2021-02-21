@@ -39,20 +39,11 @@ FROM debian:buster-slim AS base
 
 COPY --from=build /usr/local/bin/osm2pgsql /usr/local/bin/osm2pgsql
 
-RUN apt-get update && apt-get install --no-install-recommends -y libboost \
-  libboost-system libboost-filesystem libbz2 libexpat1 \
-  libosmium2 libpq libproj zlib1g liblua5.3 lua5.3 \
-  libluajit-5.1 python3 python3-psycopg2 python3-pip \
+RUN apt-get update && apt-get install --no-install-recommends -y debhelper cmake libboost-dev \
+  libboost-system-dev libboost-filesystem-dev libbz2-dev libexpat1-dev \
+  libosmium2-dev libpq-dev libproj-dev zlib1g-dev liblua5.3-dev lua5.3 libluajit-5.1-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
-# RUN apt-get update && apt-get install --no-install-recommends -y debhelper cmake libboost-dev \
-#   libboost-system-dev libboost-filesystem-dev libbz2-dev libexpat1-dev \
-#   libosmium2-dev libpq-dev libproj-dev zlib1g-dev liblua5.3-dev lua5.3 \
-#   libluajit-5.1-dev python3 python3-psycopg2 python3-pip \
-#   && apt-get clean \
-#   && rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install osmium
 
 COPY ./scripts/ /scripts/
 COPY ./processor/ /processor/
