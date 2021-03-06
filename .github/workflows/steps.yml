@@ -26,6 +26,6 @@ jobs:
           context: ./${{ github.workflow }}/
           file: ./${{ github.workflow }}/Dockerfile
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ github.workflow }}:latest
+            ghcr.io/mapdiscover/osm-import-service:latest
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
