@@ -23,8 +23,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          context: ./${{ github.workflow }}/
-          file: ./${{ github.workflow }}/Dockerfile
+          context: ./
+          file: ./Dockerfile
           tags: |
             ghcr.io/mapdiscover/osm-import-service:latest
       - name: Image digest
