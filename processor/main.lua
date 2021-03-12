@@ -34,7 +34,7 @@ function osm2pgsql.process_node(object)
         processor = poi_restaurant
     end
 
-    if processor != nil then
+    if processor ~= nil then
         tables.pois:add_row({
             name = processor.get_name(object),
             info = json.encode(processor.get_info(object))

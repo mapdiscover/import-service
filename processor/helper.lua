@@ -1,3 +1,6 @@
+-- Module container
+local helper = {}
+
 -- Helper function to remove some of the tags we usually are not interested in.
 -- Returns true if there are no tags left.
 function clean_tags(tags)
@@ -8,3 +11,8 @@ function clean_tags(tags)
 
     return next(tags) == nil
 end
+
+-- Exported functions:
+helper.clean_tags = clean_tags
+
+return helper

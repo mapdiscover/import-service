@@ -1,5 +1,5 @@
 -- Module container
-local M = {}
+local poi_restaurant = {}
 
 -- Processor implementation
 function is_processable(object)
@@ -15,8 +15,8 @@ function get_info(object)
 end
 
 -- Exported functions:
-M.is_processable = is_processable
-M.get_name = get_name
-M.get_info = get_info
+poi_restaurant.is_processable = is_processable
+poi_restaurant.get_name = get_name
+poi_restaurant.get_info = get_info
 
-return M
+return poi_restaurant

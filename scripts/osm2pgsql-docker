@@ -24,15 +24,15 @@ def start(args):
     replicationStatus = run_replication_cmd(args, "ready", ())
 
     if (replicationStatus == 1):
-        LOG.info("Initializing replication status")
-        run_replication_cmd(args, "init", (
-            "--osm-file", args.osm_file,
-            "--server", args.replication_url
-        ))
-
         LOG.info("Performing first import of " + args.osm_file)
         if (osm2pgsql_import_cmd(args) > 0):
             LOG.error("Could not import")
+            return 2
+
+        LOG.info("Initializing replication status")
+        run_replication_cmd(args, "init", (
+            "--server", args.replication_url
+        ))
     elif (replicationStatus != 0):
         LOG.error("The current replication status could not be retrieved")
         return 1
@@ -41,10 +41,11 @@ def start(args):
     LOG.info("Starting replication")
 
     replication_args = []
-    replication_args.extend('--max-diff-size', args.max_diff_size)
-    replication_args.extend('--osm2pgsql-cmd', args.osm2pgsql_cmd)
-    replication_args.append('--')
-    replication_args.extend(args.extra_params)
+    replication_args.extend(('--max-diff-size', str(args.max_diff_size)))
+    replication_args.extend(('--osm2pgsql-cmd', args.osm2pgsql_cmd))
+
+    if len(args.extra_params) > 0:
+        replication_args.extend(' '.join(args.extra_params).split())
 
     while True:
         run_replication_cmd(args, 'update', replication_args)
@@ -61,14 +62,15 @@ def run_replication_cmd(args, action, replication_args):
     if args.host:
         replication.extend(('--host', args.host))
     if args.port:
-        replication.extend(('--port', args.port))
+        replication.extend(('--port', str(args.port)))
         
     replication.extend(replication_args)
 
     LOG.debug("Calling replication with: %s", ' '.join(replication))
 
-    if args.dry_run == true:
-        return 0
+    if args.dry_run == True:
+        # Fail in dry run
+        return 1
     else:
         replicationProcess = subprocess.run(replication)
         return replicationProcess.returncode
@@ -82,13 +84,14 @@ def osm2pgsql_import_cmd(args):
     if args.host:
         osm2pgsql.extend(('-H', args.host))
     if args.port:
-        osm2pgsql.extend(('-P', args.port))
+        osm2pgsql.extend(('-P', str(args.port)))
     
-    osm2pgsql.extend(args.extra_params)
+    if len(args.extra_params) > 0:
+        osm2pgsql.extend(' '.join(args.extra_params).split())
     osm2pgsql.append(args.osm_file)
     LOG.debug("Calling osm2pgsql with: %s", ' '.join(osm2pgsql))
 
-    if args.dry_run == true:
+    if args.dry_run == True:
         return 0
     else:
         osm2pgsqlProcess = subprocess.run(osm2pgsql)
@@ -176,6 +179,9 @@ def main():
     if '"' in args.prefix:
         LOG.fatal("Prefix must not contain quotation marks.")
         return 1
+
+    for arg in args.__dict__:
+        LOG.debug("Argument: %s = %s", arg, args.__dict__[arg])
 
     return start(args)
 

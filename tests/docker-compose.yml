@@ -1,6 +1,16 @@
 version: '3.7'
 
 services:
+  database-admin:
+    image: dpage/pgadmin4:5
+    depends_on: 
+      - database
+    environment: 
+      PGADMIN_DEFAULT_EMAIL: admin@localhost
+      PGADMIN_DEFAULT_PASSWORD: mapdiscover
+      PGADMIN_DISABLE_POSTFIX: 'true'
+    ports: 
+      - 8123:80
   database:
     image: postgis/postgis:13-3.1-alpine
     environment:
@@ -18,12 +28,12 @@ services:
       args:
         OSM2PGSQL_VERSION: 1.4.1
     environment:
-      OSM_FILE: /osm/bremen-latest.osm.pbf
+      OSM_FILE: /osm/data.osm.pbf
       POSTGRES_HOST: database
       POSTGRES_DB: mapdiscover
       POSTGRES_USER: mapdiscover
     volumes:
-      - ../../bremen-latest.osm.pbf:/osm/bremen-latest.osm.pbf:ro
+      - ../../duesseldorf-regbez-latest.osm.pbf:/osm/data.osm.pbf:ro
 
 volumes:
   database-data:

@@ -1,4 +1,4 @@
-FROM debian:buster-slim AS build
+FROM debian:buster-slim
 
 ARG OSM2PGSQL_VERSION=1.4.1
 ARG OSM2PGSQL_LUAJIT=ON
@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y git make cmake g++ libboost-dev \
   libboost-system-dev libboost-filesystem-dev libexpat1-dev \
   zlib1g-dev libbz2-dev libpq-dev libproj-dev lua5.3 liblua5.3-dev \
   libluajit-5.1-dev pandoc \
+  python3 python3-pip \
+  # wget unzip \
+  lua-dkjson \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
@@ -35,17 +38,20 @@ RUN NB_CORES=$(grep -c '^processor' /proc/cpuinfo) \
 
 RUN rm -rf /src
 
-FROM debian:buster-slim AS base
+# RUN wget -O luarocks.tar.gz https://luarocks.org/releases/luarocks-3.3.1.tar.gz \
+#   && tar zxpf luarocks.tar.gz && rm luarocks.tar.gz && cd luarocks-* \
+#   && ./configure \
+#   && make \
+#   && make install
 
-COPY --from=build /usr/local/bin/osm2pgsql /usr/local/bin/osm2pgsql
+# WORKDIR /processor
+# RUN luarocks install dkjson \
+#  && luarocks install inspect
 
-RUN apt-get update && apt-get install --no-install-recommends -y debhelper cmake libboost-dev \
-  libboost-system-dev libboost-filesystem-dev libbz2-dev libexpat1-dev \
-  libosmium2-dev libpq-dev libproj-dev zlib1g-dev liblua5.3-dev lua5.3 libluajit-5.1-dev \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+WORKDIR /scripts
+RUN pip3 install osmium psycopg2
 
 COPY ./scripts/ /scripts/
 COPY ./processor/ /processor/
 
-ENTRYPOINT [ "/scripts/osm2pgsql-docker", "--dry-run -- --output=flex  --style='/processor/main.lua'" ]
+ENTRYPOINT [ "/scripts/osm2pgsql-docker", "--verbose", "--output=flex --style=/processor/main.lua" ]
