@@ -45,11 +45,11 @@ def start(args):
     replication_args.extend(('--osm2pgsql-cmd', args.osm2pgsql_cmd))
 
     if len(args.extra_params) > 0:
-        replication_args.extend(' '.join(args.extra_params).split())
+        replication_args.extend(args.extra_params)
 
     while True:
         run_replication_cmd(args, 'update', replication_args)
-        time.sleep(60)
+        time.sleep(args.replication_interval * 60)
 
 def run_replication_cmd(args, action, replication_args):
     replication = [args.replication_cmd, action]
@@ -63,6 +63,11 @@ def run_replication_cmd(args, action, replication_args):
         replication.extend(('--host', args.host))
     if args.port:
         replication.extend(('--port', str(args.port)))
+
+    if args.verbose == 3:
+        replication.append('--verbose')
+    elif args.verbose == 1:
+        replication.append('--quiet')
         
     replication.extend(replication_args)
 
@@ -106,7 +111,8 @@ def process_env(args):
         "POSTGRES_PASSWORD": "password",
         "POSTGRES_DB": "database",
         "POSTGRES_HOST": "host",
-        "POSTGRES_PREFIX": "prefix"
+        "POSTGRES_PREFIX": "prefix",
+        "REPLICATION_INTERVAL": "replication_interval"
     }
 
     for envVar in envMappings:
@@ -123,7 +129,7 @@ def get_parser():
     parser.add_argument('--dry-run', action='store_true',
                      help='Does not actually execute the commands')
 
-    # TODO: Implement those also via environment variables and hand them through
+    # TODO: Implement those also via environment variables
     group = parser.add_argument_group('Logging arguments')
     group.add_argument('-q', '--quiet', action='store_const', const=0,
                        dest='verbose', default=2,
@@ -153,12 +159,14 @@ def get_parser():
     group = parser.add_argument_group('Update arguments')
     group.add_argument('--max-diff-size', type=int, default=500,
                      help='Maximum data to load in MB (default: 500MB)')
+    group.add_argument('--replication-interval', type=int, default=1,
+                     help='Interval of replications in minutes')
     group.add_argument('--replication-cmd', default='/scripts/osm2pgsql-replication',
                      help='Path to osm2pgsql-replication command (default: /scripts/osm2pgsql-replication)')
     group.add_argument('--osm2pgsql-cmd', default='osm2pgsql',
                      help='Path to osm2pgsql command (default: osm2pgsql)')
 
-    # TODO: Implement those also via environment variables and hand them through
+    # TODO: Implement those also via environment variables
     parser.add_argument('extra_params', nargs='*', metavar='param',
                      help='Extra parameters to hand in to osm2pgsql.')
 

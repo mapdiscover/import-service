@@ -9,7 +9,9 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@localhost
       PGADMIN_DEFAULT_PASSWORD: mapdiscover
       PGADMIN_DISABLE_POSTFIX: 'true'
-    ports: 
+    volumes:
+      - ./pgadmin4-servers.json:/pgadmin4/servers.json
+    ports:
       - 8123:80
   database:
     image: postgis/postgis:13-3.1-alpine
@@ -29,6 +31,7 @@ services:
         OSM2PGSQL_VERSION: 1.4.1
     environment:
       OSM_FILE: /osm/data.osm.pbf
+      REPLICATION_URL: http://download.geofabrik.de/europe/germany/nordrhein-westfalen/duesseldorf-regbez-updates/
       POSTGRES_HOST: database
       POSTGRES_DB: mapdiscover
       POSTGRES_USER: mapdiscover

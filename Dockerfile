@@ -6,6 +6,7 @@ ARG OSM2PGSQL_LUAJIT=ON
 ENV OSM_FILE /input/source.osm.pbf
 ENV REPLICATION_URL https://planet.openstreetmap.org/replication/minute/
 ENV REPLICATION_CMD /scripts/osm2pgsql-replication
+ENV REPLICATION_INTERVAL 1
 
 ENV OSM2PGSQL_ARGUMENTS ""
 
@@ -54,4 +55,5 @@ RUN pip3 install osmium psycopg2
 COPY ./scripts/ /scripts/
 COPY ./processor/ /processor/
 
+WORKDIR /processor
 ENTRYPOINT [ "/scripts/osm2pgsql-docker", "--verbose", "--output=flex --style=/processor/main.lua" ]

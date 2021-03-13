@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "Internal Docker Postgres",
+            "Group": "Local",
+            "Port": 5432,
+            "Username": "mapdiscover",
+            "Host": "database",
+            "SSLMode": "prefer",
+            "MaintenanceDB": "postgres"
+        }
+    }
+}
