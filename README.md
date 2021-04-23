@@ -1,4 +1,4 @@
-# import-osm-service
+# import-service
 
 The service responsible to import POIs from several data sources
 
