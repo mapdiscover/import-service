@@ -28,6 +28,6 @@ jobs:
           context: ./
           file: ./Dockerfile
           tags: |
-            ghcr.io/mapdiscover/osm-import-service:latest
+            ghcr.io/mapdiscover/import-service:latest
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
